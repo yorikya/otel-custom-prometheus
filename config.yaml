@@ -1,0 +1,38 @@
+extensions:
+  zpages:
+
+receivers:
+  otlp/notls:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+
+exporters:
+  jaeger:
+    endpoint: localhost:14250
+    insecure: true
+
+  prometheus:
+    endpoint: "0.0.0.0:9090"
+
+  prometheuscustom:
+    endpoint: "0.0.0.0:9092"
+    
+  logging:
+    logLevel: debug
+
+service:
+  extensions: [zpages]
+  pipelines:
+    metrics:
+      receivers: [otlp/notls]
+      processors: [batch]
+      exporters: [prometheuscustom, prometheus]
+    
+    traces:
+      receivers: [otlp/notls]
+      processors: [batch]
+      exporters: [logging]    
